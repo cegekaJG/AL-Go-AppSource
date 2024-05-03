@@ -1,0 +1,102 @@
+name: ' Publish To AppSource'
+run-name: 'Publish To AppSource - Version ${{ inputs.appVersion }}, Projects ${{ inputs.projects }}'
+
+on:
+  workflow_dispatch:
+    inputs:
+      appVersion:
+        description: App version to deliver to AppSource (current, prerelease, draft, latest or version number)
+        required: false
+        default: 'current'
+      projects:
+        description: Projects to publish to AppSource if the repository is multi-project. Default is *, which will publish all projects to AppSource.
+        required: false
+        default: '*'
+      GoLive:
+        description: Promote AppSource App to go live if it passes technical validation?
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  actions: read
+
+defaults:
+  run:
+    shell: powershell
+
+env:
+  ALGoOrgSettings: ${{ vars.ALGoOrgSettings }}
+  ALGoRepoSettings: ${{ vars.ALGoRepoSettings }}
+
+jobs:
+  Initialization:
+    needs: [ ]
+    runs-on: [ windows-latest ]
+    outputs:
+      telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
+    steps:
+      - name: Dump Workflow Information
+        uses: cegekaJG/AL-Go-Actions/DumpWorkflowInfo@cegeka
+        with:
+          shell: powershell
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize the workflow
+        id: init
+        uses: cegekaJG/AL-Go-Actions/WorkflowInitialize@cegeka
+        with:
+          shell: powershell
+          eventId: "DO0103"
+
+  Deliver:
+    needs: [ Initialization ]
+    runs-on: [ windows-latest ]
+    name: Deliver to AppSource
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read settings
+        uses: cegekaJG/AL-Go-Actions/ReadSettings@cegeka
+        with:
+          shell: powershell
+
+      - name: Read secrets
+        id: ReadSecrets
+        uses: cegekaJG/AL-Go-Actions/ReadSecrets@cegeka
+        with:
+          shell: powershell
+          gitHubSecrets: ${{ toJson(secrets) }}
+          getSecrets: 'appSourceContext'
+
+      - name: Deliver
+        uses: cegekaJG/AL-Go-Actions/Deliver@cegeka
+        env:
+          Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
+        with:
+          shell: powershell
+          parentTelemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
+          type: 'Release'
+          projects: ${{ github.event.inputs.projects }}
+          deliveryTarget: 'AppSource'
+          artifacts: ${{ github.event.inputs.appVersion }}
+          goLive: ${{ github.event.inputs.goLive }}
+
+  PostProcess:
+    needs: [ Initialization, Deliver ]
+    if: always()
+    runs-on: [ windows-latest ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Finalize the workflow
+        id: PostProcess
+        uses: cegekaJG/AL-Go-Actions/WorkflowPostProcess@cegeka
+        with:
+          shell: powershell
+          eventId: "DO0103"
+          telemetryScopeJson: ${{ needs.Initialization.outputs.telemetryScopeJson }}
