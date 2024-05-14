@@ -27,7 +27,7 @@ jobs:
     if: (github.event.pull_request.base.repo.full_name != github.event.pull_request.head.repo.full_name) && (github.event_name != 'pull_request')
     runs-on: windows-latest
     steps:
-      - uses: cegekaJG/AL-Go-Actions/VerifyPRChanges@cegeka
+      - uses: cegekaJG/AL-Go-Actions/VerifyPRChanges@main
 
   Initialization:
     needs: [ PregateCheck ]
@@ -44,7 +44,7 @@ jobs:
       workflowDepth: ${{ steps.DetermineWorkflowDepth.outputs.WorkflowDepth }}
     steps:
       - name: Dump Workflow Information
-        uses: cegekaJG/AL-Go-Actions/DumpWorkflowInfo@cegeka
+        uses: cegekaJG/AL-Go-Actions/DumpWorkflowInfo@main
         with:
           shell: powershell
 
@@ -56,14 +56,14 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: cegekaJG/AL-Go-Actions/WorkflowInitialize@cegeka
+        uses: cegekaJG/AL-Go-Actions/WorkflowInitialize@main
         with:
           shell: powershell
           eventId: "DO0104"
 
       - name: Read settings
         id: ReadSettings
-        uses: cegekaJG/AL-Go-Actions/ReadSettings@cegeka
+        uses: cegekaJG/AL-Go-Actions/ReadSettings@main
         with:
           shell: powershell
 
@@ -74,7 +74,7 @@ jobs:
 
       - name: Determine Projects To Build
         id: determineProjectsToBuild
-        uses: cegekaJG/AL-Go-Actions/DetermineProjectsToBuild@cegeka
+        uses: cegekaJG/AL-Go-Actions/DetermineProjectsToBuild@main
         with:
           shell: powershell
           maxBuildDepth: ${{ env.workflowDepth }}
@@ -111,7 +111,7 @@ jobs:
     steps:
       - name: Pull Request Status Check
         id: PullRequestStatusCheck
-        uses: cegekaJG/AL-Go-Actions/PullRequestStatusCheck@cegeka
+        uses: cegekaJG/AL-Go-Actions/PullRequestStatusCheck@main
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
