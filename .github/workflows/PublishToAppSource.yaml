@@ -38,16 +38,16 @@ jobs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
     steps:
       - name: Dump Workflow Information
-        uses: cegekaJG/AL-Go-Actions/DumpWorkflowInfo@cegeka
+        uses: cegekaJG/AL-Go-Actions/DumpWorkflowInfo@cegeka6
         with:
           shell: powershell
 
       - name: Checkout
-        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
+        uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
 
       - name: Initialize the workflow
         id: init
-        uses: cegekaJG/AL-Go-Actions/WorkflowInitialize@cegeka
+        uses: cegekaJG/AL-Go-Actions/WorkflowInitialize@cegeka6
         with:
           shell: powershell
 
@@ -57,23 +57,23 @@ jobs:
     name: Deliver to AppSource
     steps:
       - name: Checkout
-        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
+        uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
 
       - name: Read settings
-        uses: cegekaJG/AL-Go-Actions/ReadSettings@cegeka
+        uses: cegekaJG/AL-Go-Actions/ReadSettings@cegeka6
         with:
           shell: powershell
 
       - name: Read secrets
         id: ReadSecrets
-        uses: cegekaJG/AL-Go-Actions/ReadSecrets@cegeka
+        uses: cegekaJG/AL-Go-Actions/ReadSecrets@cegeka6
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
           getSecrets: 'appSourceContext'
 
       - name: Deliver
-        uses: cegekaJG/AL-Go-Actions/Deliver@cegeka
+        uses: cegekaJG/AL-Go-Actions/Deliver@cegeka6
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
         with:
@@ -90,11 +90,11 @@ jobs:
     runs-on: [ windows-latest ]
     steps:
       - name: Checkout
-        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
+        uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: cegekaJG/AL-Go-Actions/WorkflowPostProcess@cegeka
+        uses: cegekaJG/AL-Go-Actions/WorkflowPostProcess@cegeka6
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
